@@ -31,18 +31,30 @@ chain = prompt | llm | StrOutputParser()
 print("Hi I am your AI assistant, how can I help you today?")
 page = gr.Blocks(title = "AI Assistant")
 
+def chat(user_input, history):
+    return "",[
+        {'role':'user', 'content':'hello machine'},
+    {'role':'assistant', 'content':'hello human'},
+    ]
+    # while True:
+        # user_input = input()
+        # response = chain.invoke({"input": user_input, "history": history})
+        # history.append(HumanMessage(user_input))
+        # history.append(AIMessage(response))
+        # print(response)
+
+
 with page:
     gr.Markdown(
         """
         # Chat with your AI assistant
         """
     )
-page.launch(
-    theme=gr.themes.Soft())
-while True:
-    user_input = input()
-    response = chain.invoke({"input":user_input, "history":history})
-    history.append(HumanMessage(user_input))
-    history.append(AIMessage(response))
-    print(response)
+    chatbot = gr.Chatbot()
+    msg = gr.Textbox()
+    msg.submit(chat,[msg, chatbot],[msg, chatbot])
+    clear = gr.Button("Clear Chat")
+
+page.launch(theme=gr.themes.Soft())
+
 
