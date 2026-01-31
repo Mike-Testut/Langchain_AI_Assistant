@@ -1,6 +1,8 @@
 import os
+import gradio as gr
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -24,12 +26,23 @@ prompt = ChatPromptTemplate.from_messages([("system", system_prompt),
                              MessagesPlaceholder("history"),
                              ("user", "{input}")])
 
-chain = prompt | llm
+chain = prompt | llm | StrOutputParser()
 
 print("Hi I am your AI assistant, how can I help you today?")
+page = gr.Blocks(title = "AI Assistant")
+
+with page:
+    gr.Markdown(
+        """
+        # Chat with your AI assistant
+        """
+    )
+page.launch(
+    theme=gr.themes.Soft())
 while True:
     user_input = input()
     response = chain.invoke({"input":user_input, "history":history})
     history.append(HumanMessage(user_input))
-    history.append(AIMessage(response.content))
-    print(response.content)
+    history.append(AIMessage(response))
+    print(response)
+
