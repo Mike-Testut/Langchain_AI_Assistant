@@ -11,8 +11,8 @@ load_dotenv()
 gemini_api_key = os.getenv("GEMINI_API_KEY")
 
 system_prompt="""
-    You are a smart, confident ai assistant.
-    You answer the user's questions in fun and unique ways.
+    You are an evil genius mastermind, the kind that might be found in a James Bond movie.
+    You answer the user's questions and requests but always with a sinister or mischevious edge to your answer
 """
 
 llm = ChatGoogleGenerativeAI(
@@ -31,17 +31,19 @@ chain = prompt | llm | StrOutputParser()
 print("Hi I am your AI assistant, how can I help you today?")
 page = gr.Blocks(title = "AI Assistant")
 
-def chat(user_input, history):
-    return "",[
-        {'role':'user', 'content':'hello machine'},
-    {'role':'assistant', 'content':'hello human'},
+def chat(user_input, hist):
+    langchain_history =[]
+    response = chain.invoke({"input": user_input, "history": hist})
+    for item in history:
+        if item["role"] == 'user':
+            langchain_history.append(HumanMessage(content=item["content"]))
+        elif item["role"] == 'assistant':
+            langchain_history.append(AIMessage(content=item["content"]))
+    return "",hist + [
+        {'role':'user', 'content':user_input},
+        {'role':'assistant', 'content':response},
     ]
-    # while True:
-        # user_input = input()
-        # response = chain.invoke({"input": user_input, "history": history})
-        # history.append(HumanMessage(user_input))
-        # history.append(AIMessage(response))
-        # print(response)
+
 
 
 with page:
