@@ -31,6 +31,7 @@ chain = prompt | llm | StrOutputParser()
 print("Hi I am your AI assistant, how can I help you today?")
 page = gr.Blocks(title = "AI Assistant")
 
+# takes user input and history and loops it to the AI every iteration
 def chat(user_input, hist):
     langchain_history =[]
     response = chain.invoke({"input": user_input, "history": hist})
@@ -43,8 +44,9 @@ def chat(user_input, hist):
         {'role':'user', 'content':user_input},
         {'role':'assistant', 'content':response},
     ]
-
-
+# clears the chat history shown to user
+def clear_chat():
+    return "",[]
 
 with page:
     gr.Markdown(
@@ -52,10 +54,13 @@ with page:
         # Chat with your AI assistant
         """
     )
-    chatbot = gr.Chatbot()
-    msg = gr.Textbox()
+    chatbot = gr.Chatbot(avatar_images=(None,'AI_Avatar.jpeg'), show_label=False)
+    msg = gr.Textbox(placeholder="Ask anything...")
     msg.submit(chat,[msg, chatbot],[msg, chatbot])
-    clear = gr.Button("Clear Chat")
+
+    # clears the chat history shown to user
+    clear = gr.Button("Clear Chat", variant="Secondary")
+    clear.click(clear_chat,outputs=[msg,chatbot])
 
 page.launch(theme=gr.themes.Soft())
 
